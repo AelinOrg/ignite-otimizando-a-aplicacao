@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SideBar } from './components/SideBar';
 import { Content } from './components/Content';
@@ -29,11 +29,8 @@ interface MovieProps {
 
 export function App() {
   const [selectedGenreId, setSelectedGenreId] = useState(1);
-
   const [genres, setGenres] = useState<GenreResponseProps[]>([]);
-
   const [movies, setMovies] = useState<MovieProps[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<GenreResponseProps>({} as GenreResponseProps);
 
   useEffect(() => {
     api.get<GenreResponseProps[]>('genres').then(response => {
@@ -46,14 +43,16 @@ export function App() {
       setMovies(response.data);
     });
 
-    api.get<GenreResponseProps>(`genres/${selectedGenreId}`).then(response => {
-      setSelectedGenre(response.data);
-    })
   }, [selectedGenreId]);
 
-  function handleClickButton(id: number) {
+   const handleClickButton = useCallback((id: number) => {
     setSelectedGenreId(id);
-  }
+  }, [])
+
+
+  const selectedGenre = useMemo(() => {
+    return genres.find(genre => genre.id === selectedGenreId)
+  }, [genres])
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -63,10 +62,10 @@ export function App() {
         buttonClickCallback={handleClickButton}
       />
 
-      <Content
+      {selectedGenre && <Content
         selectedGenre={selectedGenre}
         movies={movies}
-      />
+      />}
     </div>
   )
 }

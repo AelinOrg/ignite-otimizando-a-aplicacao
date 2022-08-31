@@ -1,19 +1,21 @@
-import { Button } from "./Button";
+import { VerticalNavbarItem } from "./VerticalNavbarItem";
 
-interface SideBarProps {
-  genres: Array<{
-    id: number;
-    name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
-    title: string;
-  }>;
+export interface Genre {
+  id: number;
+  name: 'action' | 'comedy' | 'documentary' | 'drama' | 'horror' | 'family';
+  title: string;
+}
+
+export interface SideBarProps {
+  genres: Array<Genre>;
   selectedGenreId: number;
   buttonClickCallback: (args: any) => void;
 }
 
 export function SideBar({
   genres,
+  buttonClickCallback,
   selectedGenreId,
-  buttonClickCallback
 }: SideBarProps) {
   return (
     <nav className="sidebar">
@@ -21,16 +23,14 @@ export function SideBar({
 
       <div className="buttons-container">
         {genres.map(genre => (
-          <Button
-            key={String(genre.id)}
-            title={genre.title}
-            iconName={genre.name}
+          <VerticalNavbarItem 
+            key={genre.id} 
+            genre={genre} 
+            isSelected={genre.id === selectedGenreId}
             onClick={() => buttonClickCallback(genre.id)}
-            selected={selectedGenreId === genre.id}
           />
         ))}
       </div>
-
     </nav>
   )
 }
